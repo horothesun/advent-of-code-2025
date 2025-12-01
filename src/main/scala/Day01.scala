@@ -7,6 +7,8 @@ import scala.annotation.tailrec
 
 object Day01:
 
+  val dialPositions: Int = 100
+
   def modSubtraction(lhs: Int, rhs: Int, mod: Int): Int =
     @tailrec def aux(i: Int): Int = if i >= 0 then i else aux(i + mod)
     val sub = lhs - rhs
@@ -15,8 +17,8 @@ object Day01:
   opaque type Pos = Int
 
   extension (p: Pos)
-    def left(n: Int): Pos = modSubtraction(lhs = p, rhs = n, mod = 100)
-    def right(n: Int): Pos = (p + n) % 100
+    def left(n: Int): Pos = modSubtraction(lhs = p, rhs = n, mod = dialPositions)
+    def right(n: Int): Pos = (p + n) % dialPositions
 
   object Pos:
     def apply(n: Int): Pos = n
@@ -38,7 +40,7 @@ object Day01:
 
   def run(start: Pos, rotations: List[Rotation]): NonEmptyList[Pos] =
     rotations
-      .foldLeft(NonEmptyList.one(start)) { case (acc @ NonEmptyList(p, tail), r) =>
+      .foldLeft(NonEmptyList.one(start)) { case (acc @ NonEmptyList(p, _), r) =>
         (r.d match {
           case Direction.Left  => p.left(r.n)
           case Direction.Right => p.right(r.n)

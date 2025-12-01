@@ -37,21 +37,7 @@ class Day01Suite extends ScalaCheckSuite:
   test("run small input rotations"):
     assertEquals(
       parseInput(smallInput).map(rotations => run(start = Pos(50), rotations)),
-      NonEmptyList
-        .of(
-          Pos(50),
-          Pos(82),
-          Pos(52),
-          Pos(0),
-          Pos(95),
-          Pos(55),
-          Pos(0),
-          Pos(99),
-          Pos(0),
-          Pos(14),
-          Pos(32)
-        )
-        .asRight[Error]
+      NonEmptyList.of(50, 82, 52, 0, 95, 55, 0, 99, 0, 14, 32).map(Pos.apply).asRight[Error]
     )
 
   test("part 1 solution on small input is 3"):
