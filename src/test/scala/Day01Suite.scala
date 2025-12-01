@@ -29,7 +29,7 @@ class Day01Suite extends ScalaCheckSuite:
   test("big input parsed to something"):
     assert(parseInput(bigInput).isRight)
 
-  property("modulo subtraction of positive numbers is always positive"):
+  property("modulo subtraction of positive numbers is always non-negative"):
     forAll(Gen.posNum[Int], Gen.posNum[Int], Gen.posNum[Int])((lhs, rhs, mod) =>
       assert(modSubtraction(lhs, rhs, mod) >= 0)
     )
