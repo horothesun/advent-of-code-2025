@@ -29,16 +29,30 @@ class Day01Suite extends ScalaCheckSuite:
   test("big input parsed to something"):
     assert(parseInput(bigInput).isRight)
 
-  property("modulo-subtraction of positive numbers is always non-negative"):
+  property("mod-subtraction of positive numbers is always non-negative"):
     forAll(Gen.posNum[Int], Gen.posNum[Int], Gen.posNum[Int])((lhs, rhs, mod) =>
       assert(modSubtraction(lhs, rhs, mod) >= 0)
     )
 
-  property("modulo-subtraction of two positive numbers in modulo 100 is always >= 0 and < 100"):
+  property("mod-subtraction of two positive numbers in mod 100 is always >= 0 and < 100"):
     val mod = 100
     forAll(Gen.choose(0, mod - 1), Gen.choose(0, mod - 1)) { (lhs, rhs) =>
       val sub = modSubtraction(lhs, rhs, mod)
       assert(0 <= sub && sub < mod)
+    }
+
+  property("rotating L<n> then R<n> returns the dial to its original position"):
+    forAll(posGen, Gen.posNum[Int]) { (p, steps) =>
+      val left = Rotation(Direction.Left, steps)
+      val right = Rotation(Direction.Right, steps)
+      assertEquals(p, p.rotated(left).rotated(right))
+    }
+
+  property("rotating R<n> then L<n> returns the dial to its original position"):
+    forAll(posGen, Gen.posNum[Int]) { (p, steps) =>
+      val right = Rotation(Direction.Right, steps)
+      val left = Rotation(Direction.Left, steps)
+      assertEquals(p, p.rotated(right).rotated(left))
     }
 
   test("run small input rotations from position 50"):
@@ -58,3 +72,5 @@ object Day01Suite:
   val smallInput: List[String] = List("L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82")
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day01_input.txt")
+
+  val posGen: Gen[Pos] = Gen.choose(0, Pos.dialPositions - 1).map(n => Pos(n).get)

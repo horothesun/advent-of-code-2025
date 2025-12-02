@@ -15,8 +15,10 @@ object Day01:
   opaque type Pos = Int
 
   extension (p: Pos)
-    def left(n: Int): Pos = modSubtraction(lhs = p, rhs = n, mod = Pos.dialPositions)
-    def right(n: Int): Pos = (p + n) % Pos.dialPositions
+    def rotated(r: Rotation): Pos = r.direction match {
+      case Direction.Left  => modSubtraction(lhs = p, rhs = r.steps, mod = Pos.dialPositions)
+      case Direction.Right => (p + r.steps) % Pos.dialPositions
+    }
 
   object Pos:
     val dialPositions: Int = 100
@@ -30,7 +32,7 @@ object Day01:
   object Direction:
     def parser: Parser[Direction] = char('L').as(Left) | char('R').as(Right)
 
-  case class Rotation(d: Direction, n: Int)
+  case class Rotation(direction: Direction, steps: Int)
 
   object Rotation:
     def parser: Parser[Rotation] =
@@ -39,14 +41,7 @@ object Day01:
   def parseInput(rows: List[String]): Either[Error, List[Rotation]] = rows.traverse(Rotation.parser.parseAll)
 
   def run(start: Pos, rotations: List[Rotation]): NonEmptyList[Pos] =
-    rotations
-      .foldLeft(NonEmptyList.one(start)) { case (acc @ NonEmptyList(p, _), r) =>
-        (r.d match {
-          case Direction.Left  => p.left
-          case Direction.Right => p.right
-        })(r.n) :: acc
-      }
-      .reverse
+    rotations.foldLeft(NonEmptyList.one(start)) { case (acc @ NonEmptyList(p, _), r) => p.rotated(r) :: acc }.reverse
 
   def part1Solution(rows: List[String]): Either[Error, Long] =
     parseInput(rows).map(rotations => run(start = Pos.fifty, rotations).count(_ == Pos.zero))
