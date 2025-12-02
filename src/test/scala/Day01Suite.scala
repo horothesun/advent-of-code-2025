@@ -29,15 +29,22 @@ class Day01Suite extends ScalaCheckSuite:
   test("big input parsed to something"):
     assert(parseInput(bigInput).isRight)
 
-  property("modulo subtraction of positive numbers is always non-negative"):
+  property("modulo-subtraction of positive numbers is always non-negative"):
     forAll(Gen.posNum[Int], Gen.posNum[Int], Gen.posNum[Int])((lhs, rhs, mod) =>
       assert(modSubtraction(lhs, rhs, mod) >= 0)
     )
 
-  test("run small input rotations"):
+  property("modulo-subtraction of two positive numbers in modulo 100 is always >= 0 and < 100"):
+    val mod = 100
+    forAll(Gen.choose(0, mod - 1), Gen.choose(0, mod - 1)) { (lhs, rhs) =>
+      val sub = modSubtraction(lhs, rhs, mod)
+      assert(0 <= sub && sub < mod)
+    }
+
+  test("run small input rotations from position 50"):
     assertEquals(
-      parseInput(smallInput).map(rotations => run(start = Pos(50), rotations)),
-      NonEmptyList.of(50, 82, 52, 0, 95, 55, 0, 99, 0, 14, 32).map(Pos.apply).asRight[Error]
+      parseInput(smallInput).map(rotations => run(start = Pos.fifty, rotations)),
+      NonEmptyList.of(50, 82, 52, 0, 95, 55, 0, 99, 0, 14, 32).traverse(Pos.apply).get.asRight[Error]
     )
 
   test("part 1 solution on small input is 3"):
