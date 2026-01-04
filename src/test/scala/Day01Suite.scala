@@ -67,6 +67,37 @@ class Day01Suite extends ScalaCheckSuite:
   test("part 1 solution on big input is 1_007"):
     assertEquals(part1Solution(bigInput), 1_007L.asRight[Error])
 
+  property("mod-subtraction with zero count returns the same mod-subtraction"):
+    forAll(Gen.posNum[Int], Gen.posNum[Int], Gen.posNum[Int])((lhs, rhs, mod) =>
+      assertEquals(modSubtractionWithZeroCount(lhs, rhs, mod)._1, modSubtraction(lhs, rhs, mod))
+    )
+
+  test("run with zero count small input rotations from position 50"):
+    assertEquals(
+      parseInput(smallInput).map(rotations => runWithZeroCount(start = Pos.fifty, rotations)),
+      NonEmptyList
+        .of(
+          (Pos(50).get, 0),
+          (Pos(82).get, 1),
+          (Pos(52).get, 0),
+          (Pos(0).get, 1),
+          (Pos(95).get, 0),
+          (Pos(55).get, 1),
+          (Pos(0).get, 1),
+          (Pos(99).get, 0),
+          (Pos(0).get, 1),
+          (Pos(14).get, 0),
+          (Pos(32).get, 1)
+        )
+        .asRight[Error]
+    )
+
+  test("part 2 solution on small input is 6"):
+    assertEquals(part2Solution(smallInput), 6L.asRight[Error])
+
+  test("part 2 solution on big input is 5_820"):
+    assertEquals(part2Solution(bigInput), 5_820L.asRight[Error])
+
 object Day01Suite:
 
   val smallInput: List[String] = List("L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82")
