@@ -7,7 +7,13 @@ import munit.ScalaCheckSuite
 
 class Day02Suite extends ScalaCheckSuite:
 
-  test("parse small input"):
+  test("parsing the malformed 10-9 range fails"):
+    assert(ProductIdRange.parser.parseAll("10-9").isLeft)
+
+  test("parsing big input succeeds"):
+    assert(parseInput(bigInput).isRight)
+
+  test("parsing small input returns the right value"):
     assertEquals(
       parseInput(smallInput),
       NonEmptyList
@@ -15,20 +21,17 @@ class Day02Suite extends ScalaCheckSuite:
           ProductIdRange(first = ProductId(11), last = ProductId(22)),
           ProductIdRange(first = ProductId(95), last = ProductId(115)),
           ProductIdRange(first = ProductId(998), last = ProductId(1012)),
-          ProductIdRange(first = ProductId(1188511880), ProductId(1188511890)),
-          ProductIdRange(first = ProductId(222220), ProductId(222224)),
-          ProductIdRange(first = ProductId(1698522), ProductId(1698528)),
-          ProductIdRange(first = ProductId(446443), ProductId(446449)),
-          ProductIdRange(first = ProductId(38593856), ProductId(38593862)),
-          ProductIdRange(first = ProductId(565653), ProductId(565659)),
-          ProductIdRange(first = ProductId(824824821), ProductId(824824827)),
-          ProductIdRange(first = ProductId(2121212118), ProductId(2121212124))
+          ProductIdRange(first = ProductId(1188511880), last = ProductId(1188511890)),
+          ProductIdRange(first = ProductId(222220), last = ProductId(222224)),
+          ProductIdRange(first = ProductId(1698522), last = ProductId(1698528)),
+          ProductIdRange(first = ProductId(446443), last = ProductId(446449)),
+          ProductIdRange(first = ProductId(38593856), last = ProductId(38593862)),
+          ProductIdRange(first = ProductId(565653), last = ProductId(565659)),
+          ProductIdRange(first = ProductId(824824821), last = ProductId(824824827)),
+          ProductIdRange(first = ProductId(2121212118), last = ProductId(2121212124))
         )
         .asRight[Error]
     )
-
-  test("parse big input doesn't fail"):
-    assert(parseInput(bigInput).isRight)
 
 object Day02Suite:
 
