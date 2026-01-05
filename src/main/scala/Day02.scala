@@ -20,7 +20,7 @@ object Day02:
   object ProductIdRange:
     def parser: Parser[ProductIdRange] =
       ((ProductId.parser <* char('-')) ~ ProductId.parser).flatMap { (first, last) =>
-        if first > last then failWith(s"Malformed range $first-$last")
+        if first > last then failWith(s"Malformed range ${first.value}-${last.value}")
         else Parser.pure(ProductIdRange(first, last))
       }
 
