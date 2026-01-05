@@ -1,12 +1,10 @@
+import cats.data.NonEmptyList
 import cats.parse.Numbers.nonNegativeIntString
 import cats.parse.Parser
 import cats.parse.Parser.Error
 import cats.parse.Parser.char
-import cats.data.NonEmptyList
 
 object Day02:
-
-  def day02: Int = 42
 
   case class ProductId(value: Long)
 
