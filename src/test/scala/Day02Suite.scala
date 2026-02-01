@@ -4,6 +4,8 @@ import cats.data.NonEmptyList
 import cats.parse.Parser.Error
 import cats.syntax.all.*
 import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.*
 
 class Day02Suite extends ScalaCheckSuite:
 
@@ -33,9 +35,29 @@ class Day02Suite extends ScalaCheckSuite:
         .asRight[Error]
     )
 
+  test("product ID 1234 is valid"):
+    assert(ProductId(1234).validated.isValid)
+
+  property("repeating twice the same sequence creates an invalid product ID"):
+    forAll(Gen.choose(min = 1, max = 999)) { n =>
+      assert(ProductId(s"$n$n".toInt).validated.isInvalid)
+    }
+
+  property("product IDs with an odd number of digits are valid"):
+    forAll(
+      Gen
+        .oneOf(
+          Gen.choose(min = 1L, max = 9L),
+          Gen.choose(min = 100L, max = 999L),
+          Gen.choose(min = 10_000L, max = 99_999L)
+        )
+        .map(ProductId.apply)
+    )(pId => assert(pId.validated.isValid))
+
 object Day02Suite:
 
   val bigInput: String = getLinesFromFile("src/test/scala/day02_input.txt").head
 
   val smallInput: String =
-    "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
+    "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449," +
+      "38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
