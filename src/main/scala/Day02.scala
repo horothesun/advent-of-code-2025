@@ -8,12 +8,16 @@ import cats.parse.Parser.Error
 import cats.parse.Parser.char
 import cats.parse.Parser.failWith
 import cats.syntax.all.*
+import fs2.{Pure, Stream}
 
 object Day02:
 
   extension (n: Int) def isOdd: Boolean = n % 2 == 1
 
   case class ProductId(value: Long):
+
+    def next: ProductId = ProductId(1 + value)
+
     def validated: Validated[Unit, ProductId] =
       val s = s"$value"
       if s.size.isOdd || {
@@ -27,7 +31,9 @@ object Day02:
     given Order[ProductId] = Order.by(_.value)
     def parser: Parser[ProductId] = nonNegativeIntString.mapFilter(_.toLongOption.map(ProductId.apply))
 
-  case class ProductIdRange(first: ProductId, last: ProductId)
+  case class ProductIdRange(first: ProductId, last: ProductId):
+    def toStream: Stream[Pure, ProductId] =
+      Stream.unfold(first)(pId => if pId.value > last.value then None else Some((pId, pId.next)))
 
   object ProductIdRange:
     def parser: Parser[ProductIdRange] =
@@ -38,3 +44,18 @@ object Day02:
 
   def parseInput(s: String): Either[Error, NonEmptyList[ProductIdRange]] =
     ProductIdRange.parser.repSep(char(',')).parseAll(s)
+
+  def part1Solution(s: String): Either[Error, Long] = parseInput(s).map(rs =>
+    Stream
+      .emits(rs.toList)
+      .flatMap(_.toStream)
+      .mapFilter(pId =>
+        pId.validated match
+          case Valid(_)   => None
+          case Invalid(_) => Some(pId)
+      )
+      .foldMap(_.value)
+      .toList
+      .headOption
+      .getOrElse(0L)
+  )

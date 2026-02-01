@@ -54,6 +54,13 @@ class Day02Suite extends ScalaCheckSuite:
         .map(ProductId.apply)
     )(pId => assert(pId.validated.isValid))
 
+  test("product range converts to stream"):
+    val range = ProductIdRange(first = ProductId(3), last = ProductId(5))
+    assertEquals(range.toStream.toList, List(ProductId(3), ProductId(4), ProductId(5)))
+
+  test("part 1 solution on small input is 1_227_775_554"):
+    assertEquals(part1Solution(smallInput), 1_227_775_554L.asRight[Error])
+
 object Day02Suite:
 
   val bigInput: String = getLinesFromFile("src/test/scala/day02_input.txt").head
