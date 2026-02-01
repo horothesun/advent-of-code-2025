@@ -61,6 +61,9 @@ class Day02Suite extends ScalaCheckSuite:
   test("part 1 solution on small input is 1_227_775_554"):
     assertEquals(part1Solution(smallInput), 1_227_775_554L.asRight[Error])
 
+  test("part 2 solution on big input is 38_310_256_125L"):
+    assertEquals(part1Solution(bigInput), 38_310_256_125L.asRight[Error])
+
 object Day02Suite:
 
   val bigInput: String = getLinesFromFile("src/test/scala/day02_input.txt").head
