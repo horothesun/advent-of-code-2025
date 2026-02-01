@@ -48,13 +48,9 @@ object Day02:
   def part1Solution(s: String): Either[Error, Long] = parseInput(s).map(rs =>
     Stream
       .emits(rs.toList)
-      .flatMap(_.toStream)
-      .mapFilter(pId =>
-        pId.validated match
-          case Valid(_)   => None
-          case Invalid(_) => Some(pId)
-      )
-      .foldMap(_.value)
+      .flatMap(r => r.toStream)
+      .filter(pId => pId.validated.isInvalid)
+      .foldMap(pId => pId.value)
       .toList
       .headOption
       .getOrElse(0L)
