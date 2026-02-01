@@ -29,13 +29,13 @@ object Day02:
 
     def newValidated: Validated[Unit, ProductId] =
       val s = s"$value"
-      def invalidString(prefixSize: Int, rep: Int): String = List.fill(rep)(s.take(prefixSize)).mkString(sep = "")
+      def invalidString(prefixSize: Int, rep: Int): String = List.fill(rep)(s.take(prefixSize)).mkString
       List
         .range(start = 1, end = 1 + s.size / 2)
-        .map(p => (p, s.size / p))
-        .filter((p, rep) => p * rep == s.size)
+        .map(prefixSize => (prefixSize, s.size / prefixSize))
+        .filter((prefixSize, rep) => prefixSize * rep == s.size)
         .reverse
-        .find((p, rep) => s == invalidString(p, rep)) match
+        .find((prefixSize, rep) => s == invalidString(prefixSize, rep)) match
         case Some(_) => Invalid(())
         case None    => Valid(this)
 
@@ -58,10 +58,10 @@ object Day02:
     ProductIdRange.parser.repSep(char(',')).parseAll(s)
 
   def solution(s: String, validated: ProductId => Validated[Unit, ProductId]): Either[Error, Long] =
-    parseInput(s).map(rs =>
+    parseInput(s).map(ranges =>
       Stream
-        .emits(rs.toList)
-        .flatMap(r => r.toStream)
+        .emits(ranges.toList)
+        .flatMap(range => range.toStream)
         .filter(pId => validated(pId).isInvalid)
         .foldMap(pId => pId.value)
         .toList

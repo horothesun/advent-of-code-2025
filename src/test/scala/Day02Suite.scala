@@ -75,7 +75,7 @@ class Day02Suite extends ScalaCheckSuite:
       Gen.choose(min = 2, max = 5),
       Gen.choose(min = 1, max = 999)
     ) { (rep, base) =>
-      val pId = ProductId(List.fill(rep)(s"$base").mkString(sep = "").toLong)
+      val pId = ProductId(List.fill(rep)(s"$base").mkString.toLong)
       assert(pId.newValidated.isInvalid)
     }
 
