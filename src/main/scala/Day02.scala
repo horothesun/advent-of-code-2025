@@ -30,14 +30,13 @@ object Day02:
     def newValidated: Validated[Unit, ProductId] =
       val s = s"$value"
       def invalidString(prefixSize: Int, rep: Int): String = List.fill(rep)(s.take(prefixSize)).mkString
-      List
+      val prefixSizeAndReps = List
         .range(start = 1, end = 1 + s.size / 2)
         .map(prefixSize => (prefixSize, s.size / prefixSize))
         .filter((prefixSize, rep) => prefixSize * rep == s.size)
-        .reverse
-        .find((prefixSize, rep) => s == invalidString(prefixSize, rep)) match
-        case Some(_) => Invalid(())
+      prefixSizeAndReps.find((p, rep) => s == invalidString(p, rep)) match
         case None    => Valid(this)
+        case Some(_) => Invalid(())
 
   object ProductId:
     given Order[ProductId] = Order.by(_.value)
