@@ -40,7 +40,7 @@ class Day02Suite extends ScalaCheckSuite:
 
   property("repeating twice the same sequence creates an invalid product ID"):
     forAll(Gen.choose(min = 1, max = 999)) { n =>
-      assert(ProductId(s"$n$n".toInt).validated.isInvalid)
+      assert(ProductId(s"$n$n".toLong).validated.isInvalid)
     }
 
   property("product IDs with an odd number of digits are valid"):
@@ -61,8 +61,29 @@ class Day02Suite extends ScalaCheckSuite:
   test("part 1 solution on small input is 1_227_775_554"):
     assertEquals(part1Solution(smallInput), 1_227_775_554L.asRight[Error])
 
-  test("part 2 solution on big input is 38_310_256_125L"):
+  test("part 1 solution on big input is 38_310_256_125L"):
     assertEquals(part1Solution(bigInput), 38_310_256_125L.asRight[Error])
+
+  test("product ID 1234 is (new)valid"):
+    assert(ProductId(1234).newValidated.isValid)
+
+  test("product ID 999 is NOT (new)valid"):
+    assert(ProductId(999).newValidated.isInvalid)
+
+  property("repeating at least twice the same sequence creates an invalid product ID"):
+    forAll(
+      Gen.choose(min = 2, max = 5),
+      Gen.choose(min = 1, max = 999)
+    ) { (rep, base) =>
+      val pId = ProductId(List.fill(rep)(s"$base").mkString(sep = "").toLong)
+      assert(pId.newValidated.isInvalid)
+    }
+
+  test("part 2 solution on small input is 4_174_379_265"):
+    assertEquals(part2Solution(smallInput), 4_174_379_265L.asRight[Error])
+
+  test("part 2 solution on big input is 58_961_152_806L"):
+    assertEquals(part2Solution(bigInput), 58_961_152_806L.asRight[Error])
 
 object Day02Suite:
 

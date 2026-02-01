@@ -27,6 +27,18 @@ object Day02:
       then Valid(this)
       else Invalid(())
 
+    def newValidated: Validated[Unit, ProductId] =
+      val s = s"$value"
+      def invalidString(prefixSize: Int, rep: Int): String = List.fill(rep)(s.take(prefixSize)).mkString(sep = "")
+      List
+        .range(start = 1, end = 1 + s.size / 2)
+        .map(p => (p, s.size / p))
+        .filter((p, rep) => p * rep == s.size)
+        .reverse
+        .find((p, rep) => s == invalidString(p, rep)) match
+        case Some(_) => Invalid(())
+        case None    => Valid(this)
+
   object ProductId:
     given Order[ProductId] = Order.by(_.value)
     def parser: Parser[ProductId] = nonNegativeIntString.mapFilter(_.toLongOption.map(ProductId.apply))
@@ -45,13 +57,18 @@ object Day02:
   def parseInput(s: String): Either[Error, NonEmptyList[ProductIdRange]] =
     ProductIdRange.parser.repSep(char(',')).parseAll(s)
 
-  def part1Solution(s: String): Either[Error, Long] = parseInput(s).map(rs =>
-    Stream
-      .emits(rs.toList)
-      .flatMap(r => r.toStream)
-      .filter(pId => pId.validated.isInvalid)
-      .foldMap(pId => pId.value)
-      .toList
-      .headOption
-      .getOrElse(0L)
-  )
+  def solution(s: String, validated: ProductId => Validated[Unit, ProductId]): Either[Error, Long] =
+    parseInput(s).map(rs =>
+      Stream
+        .emits(rs.toList)
+        .flatMap(r => r.toStream)
+        .filter(pId => validated(pId).isInvalid)
+        .foldMap(pId => pId.value)
+        .toList
+        .headOption
+        .getOrElse(0L)
+    )
+
+  def part1Solution(s: String): Either[Error, Long] = solution(s, _.validated)
+
+  def part2Solution(s: String): Either[Error, Long] = solution(s, _.newValidated)
